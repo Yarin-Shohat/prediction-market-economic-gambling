@@ -149,6 +149,56 @@ def count_words(word_list, target_list):
                 count += 1
     return count
 
+def get_words_lists_gpt(file_path) -> tuple[list, list, list]:
+    """
+    Return predefined lists of gambling, economic and ambiguous words from GPT-5 generated CSV.
+
+    return [gambling words], [economic words], [ambiguous words]
+    """
+    words_df = pd.read_csv(file_path)
+    gambling_words = words_df[words_df['category'] == 'gambling']['term'].tolist()
+    economic_words = words_df[words_df['category'] == 'economic']['term'].tolist()
+    ambiguous_words = words_df[words_df['category'] == 'ambiguous']['term'].tolist()
+    
+    gambling_words = proccess_word_list(gambling_words)
+    economic_words = proccess_word_list(economic_words)
+    ambiguous_words = proccess_word_list(ambiguous_words)
+
+    return gambling_words, economic_words, ambiguous_words
+
+def get_words_lists_claude(file_path) -> tuple[dict, dict, dict]:
+    """
+    Return predefined lists of gambling, economic and ambiguous words from Claude generated CSV.
+
+    return Gambling words: {high, medium, low}, Economic_Theory words: {high, medium, low}, Neutral words: {medium, low}
+    """
+    words_df = pd.read_csv(file_path)
+
+    gambling_High = words_df[(words_df['Category'] == 'Gambling') & (words_df['Confidence'] == 'High')]['Term'].tolist()
+    gambling_Medium = words_df[(words_df['Category'] == 'Gambling') & (words_df['Confidence'] == 'Medium')]['Term'].tolist()
+    gambling_Low = words_df[(words_df['Category'] == 'Gambling') & (words_df['Confidence'] == 'Low')]['Term'].tolist()
+    economic_High = words_df[(words_df['Category'] == 'Economic_Theory') & (words_df['Confidence'] == 'High')]['Term'].tolist()
+    economic_Medium = words_df[(words_df['Category'] == 'Economic_Theory') & (words_df['Confidence'] == 'Medium')]['Term'].tolist()
+    economic_Low = words_df[(words_df['Category'] == 'Economic_Theory') & (words_df['Confidence'] == 'Low')]['Term'].tolist()
+    ambiguous_Medium = words_df[(words_df['Category'] == 'Neutral') & (words_df['Confidence'] == 'Medium')]['Term'].tolist()
+    ambiguous_Low = words_df[(words_df['Category'] == 'Neutral') & (words_df['Confidence'] == 'Low')]['Term'].tolist()
+
+    gambling_High = proccess_word_list(gambling_High)
+    gambling_Medium = proccess_word_list(gambling_Medium)
+    gambling_Low = proccess_word_list(gambling_Low)
+    economic_High = proccess_word_list(economic_High)
+    economic_Medium = proccess_word_list(economic_Medium)
+    economic_Low = proccess_word_list(economic_Low)
+    ambiguous_Medium = proccess_word_list(ambiguous_Medium)
+    ambiguous_Low = proccess_word_list(ambiguous_Low)
+
+    gambling_words = {'high': gambling_High, 'medium': gambling_Medium, 'low': gambling_Low}
+    economic_words = {'high': economic_High, 'medium': economic_Medium, 'low': economic_Low}
+    ambiguous_words = {'medium': ambiguous_Medium, 'low': ambiguous_Low}
+
+    return gambling_words, economic_words, ambiguous_words
+
+
 def process_comments_csv(csv_path, gambling_words, economic_words, ambiguous_words, tok_dir=TOK_DIR, output_path=None, mode=None):
     """Process comments CSV to count and ratio gambling, economic, and ambiguous words in comments and attachments."""
     nlp = lemmatize()
@@ -639,12 +689,12 @@ if __name__ == "__main__":
     # fill_missed_comments_all()
 
     # # GPT words - Words Count
-    gambling_words, economic_words, ambiguous_words = get_words_lists_gpt("words_gpt.csv")
-    process_comments_csv('comments.csv', gambling_words, economic_words, ambiguous_words, output_path="comments_processed_GPT.csv", mode='gpt')
+    gambling_words, economic_words, ambiguous_words = get_words_lists_gpt(f"{WORDS_DIR}/words_gpt.csv")
+    process_comments_csv(f'{DATA_DIR}/comments.csv', gambling_words, economic_words, ambiguous_words, output_path=f"{WORDS_COUNT_DIR}/comments_processed_GPT.csv", mode='gpt')
     
     # # Claude words - Words Count
-    gambling_words, economic_words, ambiguous_words = get_words_lists_claude("words_claude.csv")
-    process_comments_csv('comments.csv', gambling_words, economic_words, ambiguous_words, output_path="comments_processed_Claude.csv", mode='claude')
+    gambling_words, economic_words, ambiguous_words = get_words_lists_claude(f"{WORDS_DIR}/words_claude.csv")
+    process_comments_csv(f'{DATA_DIR}/comments.csv', gambling_words, economic_words, ambiguous_words, output_path=f"{WORDS_COUNT_DIR}/comments_processed_Claude.csv", mode='claude')
 
     # # Count which words appears in comments with gambling or economic words - Words Count gt_0
     gambling_words, economic_words, ambiguous_words = get_words_lists_gpt(f"{WORDS_DIR}/words_gpt.csv")
@@ -652,7 +702,7 @@ if __name__ == "__main__":
         'gambling': gambling_words,
         'economic': economic_words
     }
-    count_gambeling_economic_words(csv_path=f"{WORDS_COUNT_DIR}/comments_processed_GPT.csv", output_path="gambling_economic_words_count_GPT.csv", words_lists_dict=words_lists_dict)
+    count_gambeling_economic_words(csv_path=f"{WORDS_COUNT_DIR}/comments_processed_GPT.csv", output_path=f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_GPT.csv", words_lists_dict=words_lists_dict)
 
     gambling_words_dict, economic_words_dict, ambiguous_words_dict = get_words_lists_claude(f"{WORDS_DIR}/words_claude.csv")
     # Get all words from the dicts from all categories
@@ -667,11 +717,11 @@ if __name__ == "__main__":
         'gambling': gambling_words,
         'economic': economic_words
     }
-    count_gambeling_economic_words(csv_path=f"{WORDS_COUNT_DIR}/comments_processed_Claude.csv", output_path="gambling_economic_words_count_claude.csv", words_lists_dict=words_lists_dict)
+    count_gambeling_economic_words(csv_path=f"{WORDS_COUNT_DIR}/comments_processed_Claude.csv", output_path=f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_Claude.csv", words_lists_dict=words_lists_dict)
 
     # # Check if the comments from comments_processed_gambling_economic with count > 0 are pro/against and if words appears in gemma words - Classification X Words Count
-    compare_gemma_output_with_comments_processed_gambling_economic_count(gemma_csv_path=f"{CLASSIFICATION_DIR}/comments_with_classification_gemma.csv", comments_csv_path="gambling_economic_words_count_GPT.csv", output_path="comparison_gemma_gambling_economic_GPT.csv")
-    compare_gemma_output_with_comments_processed_gambling_economic_count(gemma_csv_path=f"{CLASSIFICATION_DIR}/comments_with_classification_gemma.csv", comments_csv_path="gambling_economic_words_count_claude.csv", output_path="comparison_gemma_gambling_economic_claude.csv")
+    compare_gemma_output_with_comments_processed_gambling_economic_count(gemma_csv_path=f"{CLASSIFICATION_DIR}/comments_with_classification_gemma.csv", comments_csv_path=f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_GPT.csv", output_path=f"{CLASSIFICATION_DIR}/comparison_gemma_gambling_economic_GPT.csv")
+    compare_gemma_output_with_comments_processed_gambling_economic_count(gemma_csv_path=f"{CLASSIFICATION_DIR}/comments_with_classification_gemma.csv", comments_csv_path=f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_Claude.csv", output_path=f"{CLASSIFICATION_DIR}/comparison_gemma_gambling_economic_Claude.csv")
 
 
 ############################################################################################################
@@ -686,16 +736,16 @@ def handle_missed_comments():
     missed_comments = FILES_MISSED
     df = pd.read_csv(f'{DATA_DIR}/comments.csv')
     missed_df = df[df['id'].isin([int(cid) for cid in missed_comments])].copy()
-    missed_df.to_csv(f'comments_missed.csv', index=False)
-    print(f"Missed comments saved to comments_missed.csv")
+    missed_df.to_csv(f'{WORDS_COUNT_DIR}/comments_missed.csv', index=False)
+    print(f"Missed comments saved to {WORDS_COUNT_DIR}/comments_missed.csv")
 
     # GPT words
     gambling_words, economic_words, ambiguous_words = get_words_lists_gpt(f"{WORDS_DIR}/words_gpt.csv")
-    process_comments_csv('comments_missed.csv', gambling_words, economic_words, ambiguous_words, output_path="comments_processed_GPT.csv", mode='gpt')
+    process_comments_csv(f'{WORDS_COUNT_DIR}/comments_missed.csv', gambling_words, economic_words, ambiguous_words, output_path=f"{WORDS_COUNT_DIR}/comments_processed_GPT.csv", mode='gpt')
 
     # Claude words
     gambling_words, economic_words, ambiguous_words = get_words_lists_claude(f"{WORDS_DIR}/words_claude.csv")
-    process_comments_csv('comments_missed.csv', gambling_words, economic_words, ambiguous_words, output_path="comments_processed_Claude.csv", mode='claude')
+    process_comments_csv(f'{WORDS_COUNT_DIR}/comments_missed.csv', gambling_words, economic_words, ambiguous_words, output_path=f"{WORDS_COUNT_DIR}/comments_processed_Claude.csv", mode='claude')
 
     # # Count which words appears in comments with gambling or economic words
     gambling_words, economic_words, ambiguous_words = get_words_lists_gpt(f"{WORDS_DIR}/words_gpt.csv")
@@ -703,7 +753,7 @@ def handle_missed_comments():
         'gambling': gambling_words,
         'economic': economic_words
     }
-    count_gambeling_economic_words(csv_path=f"comments_processed_GPT.csv", output_path="gambling_economic_words_count_GPT.csv", words_lists_dict=words_lists_dict)
+    count_gambeling_economic_words(csv_path=f"{WORDS_COUNT_DIR}/comments_processed_GPT.csv", output_path=f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_GPT.csv", words_lists_dict=words_lists_dict)
 
     gambling_words_dict, economic_words_dict, ambiguous_words_dict = get_words_lists_claude(f"{WORDS_DIR}/words_claude.csv")
     # Get all words from the dicts from all categories
@@ -718,11 +768,11 @@ def handle_missed_comments():
         'gambling': gambling_words,
         'economic': economic_words
     }
-    count_gambeling_economic_words(csv_path=f"comments_processed_Claude.csv", output_path="gambling_economic_words_count_claude.csv", words_lists_dict=words_lists_dict)
+    count_gambeling_economic_words(csv_path=f"{WORDS_COUNT_DIR}/comments_processed_Claude.csv", output_path=f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_Claude.csv", words_lists_dict=words_lists_dict)
 
     # Check if the comments from comments_processed_gambling_economic with count > 0 are pro/against and if words appears in gemma words
-    compare_gemma_output_with_comments_processed_gambling_economic_count(gemma_csv_path=f"{CLASSIFICATION_DIR}/comments_with_classification_gemma.csv", comments_csv_path="gambling_economic_words_count_GPT.csv", output_path="comparison_gemma_gambling_economic_GPT.csv")
-    compare_gemma_output_with_comments_processed_gambling_economic_count(gemma_csv_path=f"{CLASSIFICATION_DIR}/comments_with_classification_gemma.csv", comments_csv_path="gambling_economic_words_count_claude.csv", output_path="comparison_gemma_gambling_economic_claude.csv")
+    compare_gemma_output_with_comments_processed_gambling_economic_count(gemma_csv_path=f"{CLASSIFICATION_DIR}/comments_with_classification_gemma.csv", comments_csv_path=f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_GPT.csv", output_path=f"{CLASSIFICATION_DIR}/comparison_gemma_gambling_economic_GPT.csv")
+    compare_gemma_output_with_comments_processed_gambling_economic_count(gemma_csv_path=f"{CLASSIFICATION_DIR}/comments_with_classification_gemma.csv", comments_csv_path=f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_Claude.csv", output_path=f"{CLASSIFICATION_DIR}/comparison_gemma_gambling_economic_Claude.csv")
 
 def fill_missed_comments(file_path, missed_comments_results_path):
     """
@@ -751,7 +801,7 @@ def fill_missed_comments(file_path, missed_comments_results_path):
     # Check if the file name dont start with comparisopn - Calculate SUM and AVERAGE
     if not os.path.basename(file_path).startswith('comparison'):
         # Calculate TOTAL_SUM and TOTAL_AVERAGE again
-        original_df = pd.read_csv("comments_missed.csv")
+        original_df = pd.read_csv(f"{WORDS_COUNT_DIR}/comments_missed.csv")
         original_cols = original_df.columns.tolist()
         new_cols = [col for col in df.columns if col not in original_cols and col != 'id']
         # Remove existing TOTAL_SUM and TOTAL_AVERAGE rows if they exist
@@ -775,19 +825,19 @@ def fill_missed_comments_all():
     """
     ## Words count files
     # GPT
-    fill_missed_comments(f"{WORDS_COUNT_DIR}/comments_processed_GPT.csv", "comments_processed_GPT.csv")
+    fill_missed_comments(f"{WORDS_COUNT_DIR}/comments_processed_GPT.csv", f"{WORDS_COUNT_DIR}/comments_processed_GPT.csv")
     # Claude
-    fill_missed_comments(f"{WORDS_COUNT_DIR}/comments_processed_Claude.csv", "comments_processed_Claude.csv")
+    fill_missed_comments(f"{WORDS_COUNT_DIR}/comments_processed_Claude.csv", f"{WORDS_COUNT_DIR}/comments_processed_Claude.csv")
 
     # # Classification comparison files
     # Gambling/Economic GPT
-    fill_missed_comments(f"{Classification_X_Words_count_DIR}/comparison_gemma_gambling_economic_GPT.csv", "comparison_gemma_gambling_economic_GPT.csv")
+    fill_missed_comments(f"{Classification_X_Words_count_DIR}/comparison_gemma_gambling_economic_GPT.csv", f"{Classification_X_Words_count_DIR}/comparison_gemma_gambling_economic_GPT.csv")
     # Gambling/Economic Claude
-    fill_missed_comments(f"{Classification_X_Words_count_DIR}/comparison_gemma_gambling_economic_claude.csv", "comparison_gemma_gambling_economic_claude.csv")
+    fill_missed_comments(f"{Classification_X_Words_count_DIR}/comparison_gemma_gambling_economic_claude.csv", f"{Classification_X_Words_count_DIR}/comparison_gemma_gambling_economic_claude.csv")
 
     # # WORDS_COUNT_GT_1_DIR
-    fill_missed_comments(f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_GPT.csv", "gambling_economic_words_count_GPT.csv")
-    fill_missed_comments(f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_claude.csv", "gambling_economic_words_count_claude.csv")
+    fill_missed_comments(f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_GPT.csv", f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_GPT.csv")
+    fill_missed_comments(f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_Claude.csv", f"{WORDS_COUNT_GT_1_DIR}/gambling_economic_words_count_Claude.csv")
 
 ############################################################################################################
 ############################################################################################################
