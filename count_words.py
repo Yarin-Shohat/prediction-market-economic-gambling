@@ -11,6 +11,7 @@ Process attachments files: tokenize, lemmatize
 FILES_MISSED = []
 NEED_TO_HANDLE = False
 
+
 def tokenize_and_save_attachments(raw_dir=RAW_DIR, tok_dir=TOK_DIR):
     """Tokenize all .txt files in raw_dir and save tokens to tok_dir with .tok.txt extension."""
     if not os.path.exists(tok_dir):
