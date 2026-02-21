@@ -1,76 +1,94 @@
-# Prediction Market Comment Analysis
 
-This project processes, analyzes, and classifies public comments and attachments related to prediction markets, focusing on identifying and quantifying references to gambling, economic theory, and insider trading. It leverages NLP techniques (tokenization, lemmatization, word counting) and machine learning model outputs for classification.
+# Economic-Gambling Comment Analysis
+
+This project processes, analyzes, and classifies public comments and attachments related to economic-gambling, focusing on identifying and quantifying references to economic and gambling terms. It leverages NLP techniques (tokenization, lemmatization, word counting) and machine learning model outputs for classification.
 
 ---
 
 ## File Tree
 
 ```
-├── classify_pro_against.py
-├── classify_pro_against_majority.py
+├── convert_to_excel.py
 ├── count_words.py
 ├── DIR_CONST.py
 ├── Get_PDF_text.py
+├── requirements.txt
+├── classification/
+│   ├── classify_individual_or_organization.py
+│   ├── classify_individual_or_organization_majority.py
+│   ├── classify_pro_against.py
+│   ├── classify_pro_against_with_rule.py
+│   ├── classify_pro_against_with_rule_majority.py
+│   ├── classify_pro_against_majority.py
+│   ├── compare_classification.py
+│   └── README.md
+├── dups/
+│   ├── add_dup_cols.py
+│   ├── get_dup_comments.py
+│   └── README.md
 └── DATA/
-│   ├── comments.csv
-│   ├── comments_missed.csv
-│   ├── Classification/
-│   │   ├── comments_with_classification_gemma.csv
-│   │   └── comments_with_classification_llama3.csv
-│   ├── Classification X Words count/
-│   │   ├── comparison_gemma_gambling_economic_claude.csv
-│   │   ├── comparison_gemma_gambling_economic_GPT.csv
-│   │   ├── comparison_gemma_inside_trading_claude.csv
-│   │   └── comparison_gemma_inside_trading_gpt5.csv
-│   ├── PDF files/
-│   │   ├── lem/
-│   │   │   └── *.len.txt
-│   │   ├── Raw/
-│   │   ├── tok/
-│   │   ├── txt/
-│   │   └── txt_clean/
-│   ├── Words/
-│   │   ├── Inside Trading_gpt5.csv
-│   │   ├── insider_trading_dictionary_claude.csv
-│   │   ├── words_claude.csv
-│   │   ├── words_gpt.csv
-│   │   └── Raw/
-│   └── Words count/
-│       ├── comments_processed_Claude.csv
-│       ├── comments_processed_GPT.csv
-│       ├── comments_processed_inside_trading_claude_weight_category.csv
-│       ├── comments_processed_inside_trading_claude.csv
-│       ├── comments_processed_inside_trading_gpt5.csv
+    ├── comments.csv
+    ├── Classification/
+    │   ├── comments_with_classification_gemma_pro_against_with_rule.csv
+    │   ├── comments_with_classification_gemma_pro_against.csv
+    │   ├── comments_with_classification_gemma_who_submit.csv
+    │   └── comparison_classification_pro_against.csv
+    ├── Classification X Words count/
+    │   ├── comparison_gemma_gambling_economic_claude.csv
+    │   └── comparison_gemma_gambling_economic_GPT.csv
+    ├── Duplicate IDs/
+    │   └── duplicate_ids.csv
+    ├── PDF files/
+    │   ├── lem/
+    │   │   └── *.pdf.len.txt
+    │   ├── tok/
+    │   └── txt_clean/
+    ├── Words/
+    │   ├── words_claude.csv
+    │   ├── words_gpt.csv
+    │   └── Raw/
+    └── Words count/
+        ├── comments_processed_Claude.csv
+        ├── comments_processed_GPT.csv
+        └── count gt 0/
 ```
 
-# Prediction Market Comment Analysis
+# Economic-Gambling Comment Analysis
 
-This repository processes, analyzes, and classifies public comments and attachments related to prediction markets, focusing on references to gambling, economic theory, and insider trading. It uses NLP techniques (tokenization, lemmatization, word counting) and large language models for classification.
+This repository processes, analyzes, and classifies public comments and attachments related to economic-gambling, focusing on references to economic and gambling terms. It uses NLP techniques (tokenization, lemmatization, word counting) and large language models for classification.
 
 ---
 
 ## Repository Structure
 
 ### Main Python Scripts
-- **Get_PDF_text.py**: Extracts text from PDF/DOCX files in the raw folder.
+- **Get_PDF_text.py**: Extracts text from PDF files in the data folder.
 - **count_words.py**: Tokenizes, lemmatizes, and counts target words in comments and attachments. Also compares word counts with model outputs.
-- **classify_pro_against.py**: Classifies comments as PRO, AGAINST, UNCLEAR, or NO COMMENT using Gemma or Llama3 models.
-- **classify_pro_against_majority.py**: Aggregates model outputs for majority classification.
-- **classification/**: Contains scripts for additional classification tasks (e.g., individual/organization, rule-based classification, comparison).
-- **dups/**: Scripts for handling duplicate comments.
 - **convert_to_excel.py**: Converts CSV outputs to Excel format for easier review.
 - **DIR_CONST.py**: Defines directory constants used throughout the project.
 
-### Data Folders
-- **DATA/**: Main data folder.
+### classification/
+- Contains scripts for various classification tasks:
+    - `classify_individual_or_organization.py`, `classify_individual_or_organization_majority.py`: Classify submitters as individuals or organizations.
+    - `classify_pro_against.py`, `classify_pro_against_with_rule.py`, `classify_pro_against_with_rule_majority.py`, `classify_pro_against_majority.py`: Classify comments as pro/against economic-gambling, with or without rule text, and with/without majority logic.
+    - `compare_classification.py`: Compare different classification results.
+    - `README.md`: Documentation for classification scripts.
+
+### dups/
+- Scripts and data for handling duplicate IDs in comments.
+    - `add_dup_cols.py`: Add duplicate columns to data.
+    - `get_dup_comments.py`: Extract duplicate comments.
+    - `README.md`: Documentation for duplicate handling.
+
+### DATA/
+- Main data folder. See [DATA/README.md](DATA/README.md) for detailed structure and file descriptions.
     - **comments.csv**: All public comments and metadata.
-    - **Classification/**: Model classification outputs.
+    - **Classification/**: Model classification outputs for economic-gambling tasks.
     - **Classification X Words count/**: CSVs comparing model outputs with word count analyses.
-    - **PDF files/**: Processed PDF files and their text representations.
-    - **Words/**: Word lists and dictionaries for classification and analysis.
-    - **Words count/**: Processed CSVs with word counts and ratios for each comment.
     - **Duplicate IDs/**: Duplicate comment ID tracking.
+    - **PDF files/**: Processed PDF files and their text representations.
+    - **Words/**: Word lists and dictionaries for economic-gambling classification and analysis.
+    - **Words count/**: Processed CSVs with word counts and ratios for each comment.
 
 ---
 
@@ -79,14 +97,14 @@ This repository processes, analyzes, and classifies public comments and attachme
 Follow these steps to reproduce all files and results:
 
 ### 1. Extract Text from Attachments
-- Run `Get_PDF_text.py` to extract text from PDF/DOCX files in DATA/PDF files/Raw.
+- Run `Get_PDF_text.py` to extract text from PDF files in DATA/PDF files/lem.
 
 ### 2. Tokenize and Lemmatize Attachments
 - Use functions in `count_words.py` to tokenize and lemmatize attachment text files.
     - Run `tokenize_and_save_attachments()` and `lemmatize_tok_files()`.
 
 ### 3. Process Comments for Word Counts
-- Use `count_words.py` to process comments and attachments for target word categories (gambling, economic, ambiguous, insider trading).
+- Use `count_words.py` to process comments and attachments for target word categories (economic, gambling, ambiguous).
     - Run `process_comments_csv()` and related functions.
     - Outputs are saved in DATA/Words count/.
 
@@ -101,9 +119,8 @@ Follow these steps to reproduce all files and results:
 - Use comparison functions in `count_words.py` and scripts in `classification/` to relate model outputs to word count analyses.
     - Outputs are saved in DATA/Classification X Words count/.
 
-### 6. Handle Duplicate and Missed Comments
+### 6. Handle Duplicate Comments
 - Use scripts in `dups/` to annotate and extract duplicate comments.
-- Use `handle_missed_comments()` and `fill_missed_comments_all()` in `count_words.py` to ensure all comments are processed.
 
 ### 7. Convert Outputs to Excel
 - Run `convert_to_excel.py` to convert CSV outputs to Excel format for easier review.
@@ -112,7 +129,7 @@ Follow these steps to reproduce all files and results:
 
 ## Model Details
 - **Gemma (google/gemma-3-12b-it)**: Default instruction-tuned model for classification.
-- **Llama3 (meta-llama/Llama-3.1-8B)**: Alternative model, selectable via command-line argument.
+- **Other LLMs**: Alternative models can be used for comparison.
 
 ---
 
