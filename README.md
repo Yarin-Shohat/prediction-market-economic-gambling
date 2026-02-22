@@ -4,6 +4,9 @@
 
 This project processes, analyzes, and classifies public comments and attachments related to economic-gambling, focusing on identifying and quantifying references to economic and gambling terms. It leverages NLP techniques (tokenization, lemmatization, word counting) and machine learning model outputs for classification.
 
+> **Related Project:** For analysis of insider trading-related words in prediction market comments, see the [prediction-market-insider-trading](https://github.com/Yarin-Shohat/prediction-market-insider-trading) repository, which applies similar NLP and classification techniques to analyze different word categories.
+
+
 ---
 
 ## Workflow Overview
