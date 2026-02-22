@@ -90,7 +90,7 @@ The analysis pipeline consists of several phases:
 
 ## Model Details
 - **Gemma (google/gemma-3-12b-it)**: Default instruction-tuned model for classification.
-- **Other LLMs**: Alternative models can be used for comparison.
+- **Llama3 (meta-llama/Llama-3.1-8B)**: Alternative model, selectable via command-line argument.
 
 ---
 
