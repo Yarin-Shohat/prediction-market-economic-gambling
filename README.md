@@ -1,11 +1,8 @@
-
-
 # Economic-Gambling Comment Analysis
 
 This project processes, analyzes, and classifies public comments and attachments related to economic-gambling, focusing on identifying and quantifying references to economic and gambling terms. It leverages NLP techniques (tokenization, lemmatization, word counting) and machine learning model outputs for classification.
 
 > **Related Project:** For analysis of insider trading-related words in prediction market comments, see the [prediction-market-insider-trading](https://github.com/Yarin-Shohat/prediction-market-insider-trading) repository, which applies similar NLP and classification techniques to analyze different word categories.
-
 
 ---
 
@@ -55,6 +52,18 @@ The analysis pipeline consists of several phases:
 ### **Phase 7: Convert Outputs to Excel**
 - Run `convert_to_excel.py` to convert CSV outputs to Excel format for easier review.
 
+### **Phase 8: Visualize Results**
+- **Folder:** `Visualizations/`
+- **Purpose:** Generate plots and visual summaries of classification and word count results.
+- **Key Notebook:** `Visualize_Prediction_Market.ipynb` (see [`Visualizations/README.md`](Visualizations/README.md) for details)
+- **Outputs:**
+    - Plots and figures saved in `Visualizations/plots/`
+    - Uses CSVs from `DATA/Classification/` and `DATA/Words count/` for input
+- **How to Use:**
+    1. Open and run `Visualize_Prediction_Market.ipynb` to generate plots and summary statistics.
+    2. Review plots in the `plots/` directory for insights and reporting.
+    3. See [`Visualizations/README.md`](Visualizations/README.md) for more information on workflow and data sources.
+
 ---
 
 ## Repository Structure
@@ -89,6 +98,13 @@ The analysis pipeline consists of several phases:
     - **Words/**: Word lists and dictionaries for economic-gambling classification and analysis.
     - **Words count/**: Processed CSVs with word counts and ratios for each comment.
 
+### Visualizations/
+- Scripts, notebook, and plots for visualizing analysis results.
+    - `Visualize_Prediction_Market.ipynb`: Main notebook for generating plots.
+    - `plots/`: Directory containing generated plot images.
+    - `null_id_no_comment_rows.csv`: Data quality tracking.
+    - `README.md`: Documentation for visualization workflow and data sources.
+
 ---
 
 ## Model Details
@@ -108,5 +124,5 @@ The analysis pipeline consists of several phases:
 ## Additional Notes
 - All processing is modular; you can run only the steps you need.
 - Word lists can be updated in the Words directory.
-- Output CSVs are saved in DATA/Words count/ and DATA/Classification X Words count/.
+- Output CSVs are saved in DATA/Words count/, DATA/Classification X Words count/, and Visualizations/plots/.
 - For more details, see the docstrings in each Python file and the README files in each subfolder.
