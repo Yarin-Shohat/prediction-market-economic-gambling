@@ -1,68 +1,64 @@
 
+
 # Economic-Gambling Comment Analysis
 
 This project processes, analyzes, and classifies public comments and attachments related to economic-gambling, focusing on identifying and quantifying references to economic and gambling terms. It leverages NLP techniques (tokenization, lemmatization, word counting) and machine learning model outputs for classification.
 
 ---
 
-## File Tree
+## Workflow Overview
 
-```
-├── convert_to_excel.py
-├── count_words.py
-├── DIR_CONST.py
-├── Get_PDF_text.py
-├── requirements.txt
-├── classification/
-│   ├── classify_individual_or_organization.py
-│   ├── classify_individual_or_organization_majority.py
-│   ├── classify_pro_against.py
-│   ├── classify_pro_against_with_rule.py
-│   ├── classify_pro_against_with_rule_majority.py
-│   ├── classify_pro_against_majority.py
-│   ├── compare_classification.py
-│   └── README.md
-├── dups/
-│   ├── add_dup_cols.py
-│   ├── get_dup_comments.py
-│   └── README.md
-└── DATA/
-    ├── comments.csv
-    ├── Classification/
-    │   ├── comments_with_classification_gemma_pro_against_with_rule.csv
-    │   ├── comments_with_classification_gemma_pro_against.csv
-    │   ├── comments_with_classification_gemma_who_submit.csv
-    │   └── comparison_classification_pro_against.csv
-    ├── Classification X Words count/
-    │   ├── comparison_gemma_gambling_economic_claude.csv
-    │   └── comparison_gemma_gambling_economic_GPT.csv
-    ├── Duplicate IDs/
-    │   └── duplicate_ids.csv
-    ├── PDF files/
-    │   ├── lem/
-    │   │   └── *.pdf.len.txt
-    │   ├── tok/
-    │   └── txt_clean/
-    ├── Words/
-    │   ├── words_claude.csv
-    │   ├── words_gpt.csv
-    │   └── Raw/
-    └── Words count/
-        ├── comments_processed_Claude.csv
-        ├── comments_processed_GPT.csv
-        └── count gt 0/
-```
+The analysis pipeline consists of several phases:
 
-# Economic-Gambling Comment Analysis
+### **Phase 0: Data Collection**
+- **Folder:** `Data Collection/`
+- **Purpose:** Automatically scrapes and downloads all public comments and attachments from the CFTC website for a specific rulemaking (ID 7512).
+- **Key Script:** `main.py` (see [`Data Collection/README.md`](Data%20Collection/README.md) for full details)
+- **Outputs:**
+    - `comments.csv`: All raw comment data and metadata
+    - `attachments/`: All downloaded files referenced in the comments
+- **How to Run:**
+    1. Install dependencies from `requirements.txt` (preferably in a virtual environment)
+    2. Run `python main.py` inside the `Data Collection` folder
+    3. See [`Data Collection/README.md`](Data%20Collection/README.md) for Docker usage and troubleshooting
 
-This repository processes, analyzes, and classifies public comments and attachments related to economic-gambling, focusing on references to economic and gambling terms. It uses NLP techniques (tokenization, lemmatization, word counting) and large language models for classification.
+### **Phase 1: Extract Text from Attachments**
+- Run `Get_PDF_text.py` to extract text from PDF/DOCX files in `DATA/PDF files/Raw`.
+
+### **Phase 2: Tokenize and Lemmatize Attachments**
+- Use functions in `count_words.py` to tokenize and lemmatize attachment text files.
+    - Run `tokenize_and_save_attachments()` and `lemmatize_tok_files()`.
+
+### **Phase 3: Process Comments for Word Counts**
+- Use `count_words.py` to process comments and attachments for target word categories (gambling, economic, ambiguous).
+    - Run `process_comments_csv()` and related functions.
+    - Outputs are saved in `DATA/Words count/`.
+
+### **Phase 4: Classify Comments**
+- Run classification scripts to label comments:
+    - `classification/classify_pro_against.py` (PRO/AGAINST/UNCLEAR/NO COMMENT)
+    - `classification/classify_pro_against_majority.py` (majority aggregation)
+    - Scripts in `classification/` for individual/organization, rule-based, and comparison tasks.
+    - Outputs are saved in `DATA/Classification/`.
+
+### **Phase 5: Compare Results**
+- Use comparison functions in `count_words.py` and scripts in `classification/` to relate model outputs to word count analyses.
+    - Outputs are saved in `DATA/Classification X Words count/`.
+
+### **Phase 6: Handle Duplicate and Missed Comments**
+- Use scripts in `dups/` to annotate and extract duplicate comments.
+- Use `handle_missed_comments()` and `fill_missed_comments_all()` in `count_words.py` to ensure all comments are processed.
+
+### **Phase 7: Convert Outputs to Excel**
+- Run `convert_to_excel.py` to convert CSV outputs to Excel format for easier review.
 
 ---
 
 ## Repository Structure
 
 ### Main Python Scripts
-- **Get_PDF_text.py**: Extracts text from PDF files in the data folder.
+- **Data Collection/**: Automated scraping and download of all public comments and attachments. See its [`README`](Data%20Collection/README.md) for details.
+- **Get_PDF_text.py**: Extracts text from PDF/DOCX files in the data folder.
 - **count_words.py**: Tokenizes, lemmatizes, and counts target words in comments and attachments. Also compares word counts with model outputs.
 - **convert_to_excel.py**: Converts CSV outputs to Excel format for easier review.
 - **DIR_CONST.py**: Defines directory constants used throughout the project.
@@ -81,7 +77,7 @@ This repository processes, analyzes, and classifies public comments and attachme
     - `README.md`: Documentation for duplicate handling.
 
 ### DATA/
-- Main data folder. See [DATA/README.md](DATA/README.md) for detailed structure and file descriptions.
+- Main data folder. See [`DATA/README.md`](DATA/README.md) for detailed structure and file descriptions.
     - **comments.csv**: All public comments and metadata.
     - **Classification/**: Model classification outputs for economic-gambling tasks.
     - **Classification X Words count/**: CSVs comparing model outputs with word count analyses.
@@ -89,41 +85,6 @@ This repository processes, analyzes, and classifies public comments and attachme
     - **PDF files/**: Processed PDF files and their text representations.
     - **Words/**: Word lists and dictionaries for economic-gambling classification and analysis.
     - **Words count/**: Processed CSVs with word counts and ratios for each comment.
-
----
-
-## Workflow: How to Reproduce All Outputs
-
-Follow these steps to reproduce all files and results:
-
-### 1. Extract Text from Attachments
-- Run `Get_PDF_text.py` to extract text from PDF files in DATA/PDF files/lem.
-
-### 2. Tokenize and Lemmatize Attachments
-- Use functions in `count_words.py` to tokenize and lemmatize attachment text files.
-    - Run `tokenize_and_save_attachments()` and `lemmatize_tok_files()`.
-
-### 3. Process Comments for Word Counts
-- Use `count_words.py` to process comments and attachments for target word categories (economic, gambling, ambiguous).
-    - Run `process_comments_csv()` and related functions.
-    - Outputs are saved in DATA/Words count/.
-
-### 4. Classify Comments
-- Run classification scripts to label comments:
-    - `classify_pro_against.py` (PRO/AGAINST/UNCLEAR/NO COMMENT)
-    - `classify_pro_against_majority.py` (majority aggregation)
-    - Scripts in `classification/` for individual/organization, rule-based, and comparison tasks.
-    - Outputs are saved in DATA/Classification/.
-
-### 5. Compare Results
-- Use comparison functions in `count_words.py` and scripts in `classification/` to relate model outputs to word count analyses.
-    - Outputs are saved in DATA/Classification X Words count/.
-
-### 6. Handle Duplicate Comments
-- Use scripts in `dups/` to annotate and extract duplicate comments.
-
-### 7. Convert Outputs to Excel
-- Run `convert_to_excel.py` to convert CSV outputs to Excel format for easier review.
 
 ---
 
